@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paramsemble-class"
+dynamic = ["version"]
+description = "Ensemble Logistic Regression for advanced classification tasks"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Stephen Chen"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "scikit-learn>=1.0.0",
+    "pandas>=1.3.0",
+    "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "joblib>=1.0.0",
+]
+
+[project.optional-dependencies]
+binning = ["optbinning>=0.19"]
+dev = [
+    "pytest>=7.0.0",
+    "hypothesis>=6.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.950",
+    "optbinning>=0.19",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "paramsemble_class.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["paramsemble_class*"]
+
+[project.urls]
+Homepage = "https://github.com/schen18/Paramsemble-Class"
+Repository = "https://github.com/schen18/Paramsemble-Class"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "sklearn",
+    "sklearn.*",
+    "pandas",
+    "pandas.*",
+    "scipy",
+    "scipy.*",
+    "joblib",
+    "joblib.*",
+    "optbinning",
+    "optbinning.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
