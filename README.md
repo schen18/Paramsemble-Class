@@ -59,7 +59,7 @@ your database** — neither of which tree ensembles offer.
 Given a training set and a **selection set** (a labeled dataset held out from training):
 
 1. **Feature combinations** — `m` feature subsets of size `f` are sampled (`sample="unique"` without intra-set repetition, `"replace"` for uniform multicombinations).
-2. **Baseline** — a reference model on all features is evaluated on the selection set (PLR, FNR, DRP plus decile ID sets DRS/DPS). The default is a full-feature logistic regression on WoE-binned features (`baseline="woe_logreg"`, requires `pip install paramsemble-class[binning]`; without optbinning it degrades to an unbinned logistic regression, logged and visible in `baseline_kind_`). `baseline="random_forest"` restores the classic reference.
+2. **Baseline** — a reference model on all features is evaluated on the selection set (PLR, FNR, DRP plus decile ID sets DRS/DPS). The default is a full-feature logistic regression on WoE-binned features (`baseline="woe_logreg"`; optbinning is a core dependency, and if it is ever unavailable the baseline degrades to an unbinned logistic regression, logged and visible in `baseline_kind_`). `baseline="random_forest"` restores the classic reference.
 3. **Constituents** — `m` logistic regressions are trained on the feature subsets and evaluated the same way.
 4. **Selection & combination** — models that beat the baseline on any metric are ranked by a Borda count over PLR/FNR/DRP, then combined by the chosen `method`.
 5. **Deployment** — selected equations export to JSON, scoreable in Python or SQL.
@@ -266,12 +266,13 @@ predictions = scorer.score(X_new, ids_new)
 
 ## Requirements
 
-- Python >= 3.8
+- Python >= 3.12
 - scikit-learn >= 1.0.0
 - pandas >= 1.3.0
 - numpy >= 1.21.0
 - scipy >= 1.7.0
 - joblib >= 1.0.0
+- optbinning >= 1.0
 
 ## Development
 
