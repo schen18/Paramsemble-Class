@@ -5,6 +5,8 @@ JSON export/import, SQL generation, and sklearn compatibility.
 """
 
 import pytest
+
+from tests.conftest import requires_sqlite_math
 import numpy as np
 import pandas as pd
 import tempfile
@@ -144,7 +146,10 @@ class TestCompleteWorkflow:
         assert clf.constituent_models_ is not None
         assert len(clf.constituent_models_) > 0
         assert clf.result_df_ is not None
-        assert clf.meta_equation_ is not None
+        if clf.fell_back_to_baseline_:
+            assert clf.meta_equation_ is None
+        else:
+            assert clf.meta_equation_ is not None
 
         # Verify result structure
         assert "id" in clf.result_df_.columns
@@ -390,6 +395,7 @@ class TestJSONExportScoring:
 class TestSQLGeneration:
     """Test SQL generation and execution against SQLite database."""
 
+    @requires_sqlite_math
     def test_intersect_sql_generation_and_execution(self):
         """Test intersect method SQL generation and execution."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -452,6 +458,7 @@ class TestSQLGeneration:
             finally:
                 conn.close()
 
+    @requires_sqlite_math
     def test_ensemble_sql_generation_and_execution(self):
         """Test ensemble method SQL generation and execution."""
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -22,8 +22,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+          pip install pytest-github-actions-annotate-failures
       - name: Run tests
-        run: pytest tests/ -q
+        run: pytest tests/ -q --tb=short -ra
 
   lint:
     runs-on: ubuntu-latest
@@ -32,8 +33,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install linters
-        run: pip install black flake8 mypy
+      - name: Install package with dev dependencies
+        # the package's own dependencies (numpy etc.) are needed for mypy
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
       - name: black (format check)
         run: black --check paramsemble_class/ tests/
       - name: flake8

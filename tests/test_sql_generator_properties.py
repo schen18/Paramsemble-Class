@@ -1,3 +1,5 @@
+from tests.conftest import requires_sqlite_math
+
 """Property-based tests for SQL generator module."""
 
 import json
@@ -93,6 +95,7 @@ def model_json_strategy(draw, method=None):
 # **Validates: Requirements 11.1, 11.8**
 @settings(max_examples=100)
 @given(method=st.sampled_from(["intersect", "venn", "ensemble"]), data=st.data())
+@requires_sqlite_math
 def test_sql_generation_produces_valid_syntax(method, data):
     """
     Property 30: SQL generation produces valid syntax.
@@ -164,6 +167,7 @@ def test_sql_generation_produces_valid_syntax(method, data):
 # **Validates: Requirements 11.5**
 @settings(max_examples=100)
 @given(equation=equation_dict_strategy(), data=st.data())
+@requires_sqlite_math
 def test_sql_logistic_regression_formula_correctness(equation, data):
     """
     Property 31: SQL logistic regression formula correctness.
@@ -260,6 +264,7 @@ def test_sql_logistic_regression_formula_correctness(equation, data):
     d=st.integers(min_value=1, max_value=10),
     data=st.data(),
 )
+@requires_sqlite_math
 def test_sql_intersect_venn_decile_logic(method, d, data):
     """
     Property 32: SQL intersect/venn decile logic.
@@ -359,6 +364,7 @@ def test_sql_intersect_venn_decile_logic(method, d, data):
 # **Validates: Requirements 11.4, 11.7**
 @settings(max_examples=100)
 @given(data=st.data())
+@requires_sqlite_math
 def test_sql_ensemble_meta_model_application(data):
     """
     Property 33: SQL ensemble meta-model application.

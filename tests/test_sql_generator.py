@@ -5,6 +5,8 @@ import os
 import tempfile
 import sqlite3
 import pytest
+
+from tests.conftest import requires_sqlite_math
 from paramsemble_class.sql.generator import SQLGenerator
 
 
@@ -115,6 +117,7 @@ class TestSQLGenerator:
         finally:
             os.unlink(json_path)
 
+    @requires_sqlite_math
     def test_generated_sql_can_be_parsed(self):
         """Test that generated SQL can be parsed (syntax check)."""
         # Create sample model JSON
@@ -163,6 +166,7 @@ class TestSQLGenerator:
         finally:
             os.unlink(json_path)
 
+    @requires_sqlite_math
     def test_feature_names_are_properly_escaped(self):
         """Test that feature names are properly escaped in SQL."""
         # Create model with feature names that need escaping

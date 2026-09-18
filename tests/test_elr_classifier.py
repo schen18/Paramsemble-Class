@@ -239,7 +239,8 @@ class TestELRClassifierAPI:
         assert "id" in predictions.columns
         assert "sets" in predictions.columns
         assert predictions["sets"].min() >= 1
-        assert predictions["sets"].max() <= len(clf.selected_indices_)
+        # fallback output uses a single model (sets == 1)
+        assert predictions["sets"].max() <= max(len(clf.selected_indices_), 1)
 
     def test_venn_method_workflow(self, sample_data):
         """Test end-to-end workflow for venn method."""
@@ -278,9 +279,13 @@ class TestELRClassifierAPI:
         assert predictions["predicted"].min() >= 0
         assert predictions["predicted"].max() <= 1
 
-        # Check meta-model equation exists
-        assert clf.meta_equation_ is not None
-        assert "constant" in clf.meta_equation_
+        # Check meta-model equation exists (unless the honest baseline
+        # fallback is active, in which case baseline probabilities are used)
+        if clf.fell_back_to_baseline_:
+            assert clf.meta_equation_ is None
+        else:
+            assert clf.meta_equation_ is not None
+            assert "constant" in clf.meta_equation_
 
     def test_predict_proba_for_ensemble_method(self, sample_data):
         """Test predict_proba method for ensemble method."""

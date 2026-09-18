@@ -24,6 +24,8 @@ import warnings
 import numpy as np
 import pandas as pd
 import pytest
+
+from tests.conftest import requires_sqlite_math
 from sklearn.datasets import make_classification
 from sklearn.model_selection import GridSearchCV, cross_val_score, train_test_split
 
@@ -92,6 +94,7 @@ class TestDecileConsistency:
         assert list(idx[1:]) == [0, 2, 3]
 
     @pytest.mark.parametrize("method", ["intersect", "venn"])
+    @requires_sqlite_math
     def test_fit_predict_scorer_sql_agree(self, imbalanced_data, method):
         X_train, X_sel, y_train, y_sel, ids = imbalanced_data
         assert len(X_sel) % 10 != 0, "fixture must keep a non multiple-of-10 size"
@@ -127,6 +130,7 @@ class TestDecileConsistency:
             pd.testing.assert_frame_equal(detailed, sql_df)
             conn.close()
 
+    @requires_sqlite_math
     def test_ensemble_scorer_and_sql_agree_with_python(self, imbalanced_data):
         with tempfile.TemporaryDirectory() as tmpdir:
             clf, modeljson = _fit(tmpdir, "ensemble", imbalanced_data)
@@ -310,6 +314,7 @@ class TestBaselineFallback:
         assert (detailed["sets"] == 1).all()
         assert set(detailed["id"]) == set(clf.baseline_results_["drs"])
 
+    @requires_sqlite_math
     def test_fallback_exports_baseline_equation(self, imbalanced_data):
         """With a linear baseline, the fallback modeljson carries the
         baseline equation (binned when optbinning is available) and scores
