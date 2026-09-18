@@ -24,7 +24,12 @@ jobs:
           pip install -e ".[dev]"
           pip install pytest-github-actions-annotate-failures
       - name: Run tests
-        run: pytest tests/ -q --tb=short -ra
+        # on failure, append the log tail to the public job summary so the
+        # cause is readable without log-download permissions
+        run: >-
+          pytest tests/ -q --tb=short -ra > pytest.log 2>&1 ||
+          (tail -150 pytest.log >> "$GITHUB_STEP_SUMMARY";
+           tail -60 pytest.log; exit 1)
 
   lint:
     runs-on: ubuntu-latest

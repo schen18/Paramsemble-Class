@@ -19,8 +19,14 @@ compatibility, and packaging cleanup.
   ties broken by row order (`paramsemble_class.metrics.performance.top_d_count`).
 - **Ensemble method leakage.** The meta-model was previously fit *and*
   scored on the same selection rows, producing optimistically biased
-  probabilities. It is now fit on out-of-fold predictions of the
-  selection set (stratified 5-fold, reduced automatically for small data).
+  probabilities. It is now fit on genuine out-of-fold predictions of the
+  selection set: the selected constituents are refit on each stratified
+  fold's training portion (5 folds, reduced automatically for small data)
+  and predict the held-out rows, so the meta-model never sees the rows it
+  is scored on. (An earlier revision of this fix only re-predicted with
+  already-fit models per fold, which reproduces the full prediction
+  matrix and provides no protection — caught by CI on Linux, where
+  batch-vs-subset BLAS results are bitwise identical.)
 - **Ensemble method crash when no models pass the baseline gate.**
   All methods now fall back to the baseline Random Forest (with a
   warning) instead of raising or returning fabricated zeros.

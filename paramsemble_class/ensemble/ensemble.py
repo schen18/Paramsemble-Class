@@ -81,13 +81,19 @@ class EnsembleMethod:
         selected_indices,
         n_splits: int,
         random_state: Optional[int] = None,
+        solver: str = "lbfgs",
+        class_weight: Optional[Any] = None,
     ) -> Optional[np.ndarray]:
         """
-        Build out-of-fold meta features for the selection set.
+        Build genuine out-of-fold meta features for the selection set.
 
-        Each row of the returned matrix contains probabilities predicted by
-        models for a fold in which that row was held out, so the meta-model
-        can be fit without target leakage.
+        For each fold, the *selected* constituents are REFIT on the fold's
+        training portion (of the selection set) and predict the held-out
+        rows. Each row of the returned matrix therefore contains
+        probabilities from models that never saw that row, so the
+        meta-model is fit without target leakage. Merely predicting with
+        already-fit models per fold would reproduce the full prediction
+        matrix exactly and provide no protection.
 
         Returns None when the data is too small to split.
         """
@@ -102,7 +108,12 @@ class EnsembleMethod:
         splitter = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
         for train_idx, held_idx in splitter.split(X, y):
             for col, model_idx in enumerate(selected_indices):
-                proba = constituent_models[model_idx].predict_proba(X[held_idx])[:, 1]
+                template = constituent_models[model_idx]
+                fold_model = LogisticRegression(
+                    solver=solver, max_iter=1000, class_weight=class_weight
+                )
+                fold_model.fit(X[train_idx][:, template.feature_indices], y[train_idx])
+                proba = fold_model.predict_proba(X[held_idx][:, template.feature_indices])[:, 1]
                 X_meta[held_idx, col] = proba
         return X_meta
 
@@ -168,6 +179,7 @@ class EnsembleMethod:
             selected_indices,
             n_splits=META_FOLDS,
             random_state=random_state,
+            class_weight=class_weight,
         )
         if X_meta_oof is None:
             logger.warning(
