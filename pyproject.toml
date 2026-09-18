@@ -34,14 +34,17 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-binning = ["optbinning>=0.19"]
+# optbinning 1.0 requires Python >= 3.11 and is the only release compatible
+# with modern scikit-learn (0.9.x breaks on sklearn >= 1.6). On older
+# Pythons the woe_logreg baseline degrades gracefully to an unbinned LR.
+binning = ["optbinning>=1.0"]
 dev = [
     "pytest>=7.0.0",
     "hypothesis>=6.0.0",
     "black>=22.0.0",
     "flake8>=4.0.0",
     "mypy>=0.950",
-    "optbinning>=0.19",
+    "optbinning>=1.0; python_version >= '3.11'",
 ]
 
 [tool.setuptools.dynamic]
