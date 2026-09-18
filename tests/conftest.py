@@ -9,8 +9,9 @@ from sklearn.datasets import make_classification
 import numpy as np
 import pandas as pd
 
-# CI runners are slow; hypothesis' default 200ms/example deadline flakes there.
-settings.register_profile("ci", deadline=None)
+# CI runners are slow (deadline flake) and reruns must be reproducible:
+# derandomize hypothesis so property tests explore the same cases every run.
+settings.register_profile("ci", deadline=None, derandomize=True)
 settings.load_profile("ci")
 
 
